@@ -9,11 +9,12 @@ export class NotificationService {
   constructor(
     private _ipc: IpcService
   ) {
+    window.sendNot = this.sendNotification.bind(this);
   }
 
   /** Send Notification to the backend */
   public sendNotification(title: string, desc: string) {
-    if (window.electron) {
+    if (this._ipc.isIpcAvailable()) {
       this.runNotification(title, desc);
     }
   }

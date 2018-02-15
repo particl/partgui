@@ -160,8 +160,10 @@ export class MainViewComponent implements OnInit, OnDestroy {
   @HostListener('window:keydown', ['$event'])
   keyDownEvent(event: any) {
     if (event.metaKey && event.keyCode === 86 && navigator.platform.indexOf('Mac') > -1) {
+      /*
       document.execCommand('Paste');
       event.preventDefault();
+      */
     }
   }
 

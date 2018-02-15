@@ -6,7 +6,6 @@ import { IpcListener, ObservableFactoryFunction, Receiver, ListenerEvent } from 
 
 // RxIPC related stuffs
 
-
 @Injectable()
 export class IpcService {
 
@@ -19,12 +18,12 @@ export class IpcService {
   constructor(public zone: NgZone) {
 
     // if not electron, quit
-    if (!window.electron) {
+    if (!this.isIpcAvailable()) {
       return;
     }
 
     // Respond to checks if a listener is registered
-    window.ipc.on('rx-ipc-check-listener', (event, channel) => {
+    chrome.ipcRenderer.on('rx-ipc-check-listener', (event, channel) => {
       const replyChannel = 'rx-ipc-check-reply:' + channel;
       if (this.listeners[channel]) {
         event.sender.send(replyChannel, true);
@@ -34,10 +33,14 @@ export class IpcService {
     });
   }
 
+  public isIpcAvailable(): boolean {
+    return (chrome.ipcRenderer !== undefined);
+  }
+
   checkRemoteListener(channel: string, receiver: Receiver) {
-    const target = receiver == null ? window.ipc : receiver;
+    const target = receiver == null ? chrome.ipcRenderer : receiver;
     return new Promise((resolve, reject) => {
-      window.ipc.once('rx-ipc-check-reply:' + channel, (event, result) => {
+      chrome.ipcRenderer.once('rx-ipc-check-reply:' + channel, (event, result) => {
         if (result) {
           resolve(result);
         } else {
@@ -49,7 +52,7 @@ export class IpcService {
   }
 
   public cleanUp() {
-    window.ipc.removeAllListeners('rx-ipc-check-listener');
+    chrome.ipcRenderer.removeAllListeners('rx-ipc-check-listener');
     Object.keys(this.listeners).forEach((channel) => {
       this.removeListeners(channel);
     });
@@ -57,7 +60,7 @@ export class IpcService {
 
   registerListener(channel: string, observableFactory: ObservableFactoryFunction) {
     this.listeners[channel] = true;
-    window.ipc.on(channel, function openChannel(event: ListenerEvent, subChannel: string, ...args: any[]) {
+    chrome.ipcRenderer.on(channel, function openChannel(event: ListenerEvent, subChannel: string, ...args: any[]) {
         // Save the listener function so it can be removed
         const replyTo = event.sender;
         const observable = observableFactory(...args);
@@ -76,7 +79,7 @@ export class IpcService {
   }
 
   removeListeners(channel: string) {
-    window.ipc.removeAllListeners(channel);
+    chrome.ipcRenderer.removeAllListeners(channel);
     delete this.listeners[channel];
   }
 
@@ -84,7 +87,7 @@ export class IpcService {
     const self = this;
     const subChannel = channel + ':' + this.listenerCount;
     this.listenerCount++;
-    const target = receiver == null ? window.ipc : receiver;
+    const target = receiver == null ? chrome.ipcRenderer : receiver;
 
     target.send(channel, subChannel, ...args);
     return new Observable((observer) => {
@@ -92,7 +95,7 @@ export class IpcService {
         .catch(() => {
           observer.error('Invalid channel: ' + channel);
         });
-      window.ipc.on(subChannel, function listener(event: Event, type: string, data: Object) {
+      chrome.ipcRenderer.on(subChannel, function listener(event: Event, type: string, data: Object) {
         self.zone.run(() => {
           switch (type) {
             case 'n':
@@ -107,7 +110,7 @@ export class IpcService {
           // Cleanup
           return () => {
             // TODO: Why is this not being called & when should it be?
-            window.ipc.removeListener(subChannel, listener);
+            chrome.ipcRenderer.removeListener(subChannel, listener);
           };
         });
       });
@@ -115,7 +118,7 @@ export class IpcService {
   }
 
   private _getListenerCount(channel: string) {
-    return window.ipc.listenerCount(channel);
+    return chrome.ipcRenderer.listenerCount(channel);
   }
 
 }

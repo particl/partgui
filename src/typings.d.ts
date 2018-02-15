@@ -8,8 +8,13 @@ interface NodeModule {
 
 interface Window {
   electron: boolean;
-  require: any;
-  ipc: {
+  readClipboard: () => string;
+  sendNot: (title: string, desc: string) => void;
+}
+
+declare var chrome: Chrome;
+interface Chrome {
+  ipcRenderer: {
     on: (channel: string, listener: Function) => void;
     once: (channel: string, listener: Function) => void;
     send: (channel: string, arguments?: {}) => void;
@@ -18,5 +23,9 @@ interface Window {
     removeListener: (channel: string, listener: Function) => void;
     removeAllListeners: (channel?: string) => void;
     listenerCount: (channel?: string) => number;
+  },
+  remote: {
+    clipboard: any
   }
 }
+

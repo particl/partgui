@@ -3,6 +3,8 @@ const spawn = require('buffered-spawn');
 const path  = require('path');
 const log   = require('electron-log');
 
+const util  = require('./util/util');
+
 let wallets = [];
 
 // TODO: move to a path.js module
@@ -15,7 +17,7 @@ exports.getPath = function () {
   if (platform == 'linux') {
     return path.join(app.getPath('home'), '.particl');
   } else {
-    return app.getPath('userData');
+    return util.getCustomUserPath();
   }
 }
 

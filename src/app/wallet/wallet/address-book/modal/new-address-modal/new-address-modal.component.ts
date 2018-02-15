@@ -171,7 +171,6 @@ export class NewAddressModalComponent implements OnInit {
   }
 
   pasteAddress(): void {
-    this.addressInput.nativeElement.focus();
-    document.execCommand('paste');
+    this.addressInput.nativeElement.value = window.readClipboard();
   }
 }

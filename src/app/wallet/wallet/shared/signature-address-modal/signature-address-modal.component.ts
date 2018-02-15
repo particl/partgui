@@ -155,8 +155,7 @@ export class SignatureAddressModalComponent implements OnInit {
   }
 
   pasteAddress(): void {
-    this.addressInput.nativeElement.focus();
-    document.execCommand('paste');
+    this.addressInput.nativeElement.value = window.readClipboard();
   }
 
   copyToClipBoard(): void {
@@ -164,8 +163,7 @@ export class SignatureAddressModalComponent implements OnInit {
   }
 
   pasteSignature(): void {
-    this.signatureInput.nativeElement.focus();
-    document.execCommand('paste');
+    this.signatureInput.nativeElement.value = window.readClipboard();
   }
 
   dialogClose(): void {

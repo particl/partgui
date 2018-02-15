@@ -104,7 +104,6 @@ export class PassphraseComponent implements  OnChanges {
   }
 
   pasteContent() {
-    this.phrase.nativeElement.focus();
-    document.execCommand('Paste');
+    this.phrase.nativeElement.value = window.readClipboard();
   }
 }

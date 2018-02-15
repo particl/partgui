@@ -47,7 +47,6 @@ export class BlockStatusService {
       .subscribe(
         height => {
           this.log.d('getBlockCount(): triggered');
-          this.status.lastBlockTime = new Date(+this._rpcState.get('getblockchaininfo').mediantime * 1000);
           this.calculateSyncingDetails(height);
 
           // must be after calculateSyncingDetails
@@ -76,6 +75,11 @@ export class BlockStatusService {
           }
         },
         error => this.log.error('constructor blockstatus: getBlockCountNetwork() subscription error:' + error));
+
+    this._rpcState.observe('getblockchaininfo', 'mediantime')
+      .subscribe(
+        (mediantime: number) => this.status.lastBlockTime = new Date(mediantime * 1000)
+    );
   }
 
 

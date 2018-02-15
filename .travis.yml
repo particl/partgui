@@ -26,7 +26,8 @@ before_install:
 
 before_script:
   - npm install -g @angular/cli
-  - npm install
+  - npm install -g yarn
+  - yarn install
 
 script:
   - echo 'Build Dist' && echo -en 'travis_fold:start:script.build\\r'
@@ -36,7 +37,7 @@ script:
   - echo -en 'travis_fold:end:script.build\\r'
   - echo 'Lint Codebase' && echo -en 'travis_fold:start:script.lint\\r'
 
-  - npm run lint
+  - yarn run lint
 
   - echo -en 'travis_fold:end:script.lint\\r'
   - echo 'Test Codebase' && echo -en 'travis_fold:start:script.test\\r'
